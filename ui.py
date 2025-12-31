@@ -1,10 +1,32 @@
 import sys
+import json
+import os
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QTableWidget, QTableWidgetItem,
     QWidget, QVBoxLayout, QLabel, QHeaderView
 )
 from PyQt6.QtCore import QTimer, QThread, pyqtSignal, Qt
 from backend import revisar_correos
+
+
+# ===================== ARCHIVO DE PERSISTENCIA =====================
+PAGOS_FILE = "pagos_guardados.json"
+
+
+def cargar_pagos_guardados():
+    if not os.path.exists(PAGOS_FILE):
+        return []
+
+    try:
+        with open(PAGOS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def guardar_pagos(pagos):
+    with open(PAGOS_FILE, "w", encoding="utf-8") as f:
+        json.dump(pagos, f, indent=2, ensure_ascii=False)
 
 
 # ===================== WORKER =====================
@@ -20,11 +42,12 @@ class WorkerRevisarCorreos(QThread):
 class VentanaPrincipal(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.primera_revision = True
 
         self.setWindowTitle("Pagos Bancolombia")
         self.setMinimumSize(1000, 500)
 
-        # ---------- CONTENEDOR PRINCIPAL ----------
+        # ---------- CONTENEDOR ----------
         contenedor = QWidget()
         layout = QVBoxLayout(contenedor)
         layout.setSpacing(15)
@@ -78,17 +101,16 @@ class VentanaPrincipal(QMainWindow):
                 border-radius: 10px;
                 font-size: 14px;
                 gridline-color: #e0e0e0;
-                color: #212121;  /* TEXTO SIEMPRE OSCURO */
+                color: #212121;
             }
 
             QTableWidget::item {
                 padding: 8px;
-                color: #212121;  /* FUERZA COLOR DEL TEXTO */
+                color: #212121;
             }
 
             QTableWidget::item:alternate {
                 background-color: #f5f7fa;
-                color: #212121;
             }
 
             QHeaderView::section {
@@ -105,26 +127,40 @@ class VentanaPrincipal(QMainWindow):
             }
         """)
 
-        self.tabla.setRowHeight(0, 40)
-
-        # ---------- AGREGAR AL LAYOUT ----------
         layout.addWidget(self.label_titulo)
         layout.addWidget(self.label_subtitulo)
         layout.addWidget(self.tabla)
-
         self.setCentralWidget(contenedor)
 
         # ---------- LOGICA ----------
         self.uids_mostrados = set()
-        self.primera_carga = True
 
+        # 🔹 Cargar pagos guardados al iniciar
+        self.pagos_guardados = cargar_pagos_guardados()
+        for pago in self.pagos_guardados:
+            self._agregar_pago_a_tabla(pago)
+            self.uids_mostrados.add(pago["uid"])
+
+        # ---------- TIMER ----------
         self.timer = QTimer()
         self.timer.timeout.connect(self.actualizar_pagos)
         self.timer.start(60_000)
 
         self.actualizar_pagos()
 
-    # ===================== ACTUALIZAR =====================
+    # ===================== FUNCIONES =====================
+    def _agregar_pago_a_tabla(self, pago):
+        fila = self.tabla.rowCount()
+        self.tabla.insertRow(fila)
+
+        self.tabla.setItem(fila, 0, QTableWidgetItem(pago["comercio"]))
+        self.tabla.setItem(fila, 1, QTableWidgetItem(pago["pagador"]))
+        self.tabla.setItem(fila, 2, QTableWidgetItem(pago["monto"]))
+        self.tabla.setItem(fila, 3, QTableWidgetItem(pago["fecha"]))
+        self.tabla.setItem(fila, 4, QTableWidgetItem(pago["hora"]))
+
+        self.tabla.setRowHeight(fila, 40)
+
     def actualizar_pagos(self):
         self.timer.stop()
         self.worker = WorkerRevisarCorreos()
@@ -133,27 +169,22 @@ class VentanaPrincipal(QMainWindow):
         self.worker.start()
 
     def mostrar_pagos(self, pagos):
-        if self.primera_carga:
+        if self.primera_revision:
+            # SOLO sincroniza UIDs, NO guarda ni muestra
             for pago in pagos:
                 self.uids_mostrados.add(pago["uid"])
-            self.primera_carga = False
+            self.primera_revision = False
             return
 
         for pago in pagos:
             if pago["uid"] in self.uids_mostrados:
                 continue
 
-            fila = self.tabla.rowCount()
-            self.tabla.insertRow(fila)
+            self._agregar_pago_a_tabla(pago)
 
-            self.tabla.setItem(fila, 0, QTableWidgetItem(pago["comercio"]))
-            self.tabla.setItem(fila, 1, QTableWidgetItem(pago["pagador"]))
-            self.tabla.setItem(fila, 2, QTableWidgetItem(pago["monto"]))
-            self.tabla.setItem(fila, 3, QTableWidgetItem(pago["fecha"]))
-            self.tabla.setItem(fila, 4, QTableWidgetItem(pago["hora"]))
-
-            self.tabla.setRowHeight(fila, 40)
             self.uids_mostrados.add(pago["uid"])
+            self.pagos_guardados.append(pago)
+            guardar_pagos(self.pagos_guardados)
 
 
 # ===================== MAIN =====================

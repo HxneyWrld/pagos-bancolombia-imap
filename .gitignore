@@ -3,3 +3,4 @@
 __pycache__/
 .env
 last_uid.txt
+pagos_guardados.json
