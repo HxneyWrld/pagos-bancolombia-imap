@@ -75,7 +75,7 @@ def revisar_correos():
             if match:
                 pago = {
                     "tipo": "personal",
-                    "comercio": "Transferencia personal (QR)",
+                    "comercio": "Cuenta Personal (QR)",
                     "pagador": match.group(2).strip(),
                     "monto": match.group(1),
                     "fecha": match.group(3),
