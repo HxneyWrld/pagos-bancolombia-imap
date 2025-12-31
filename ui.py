@@ -26,7 +26,8 @@ class VentanaPrincipal(QMainWindow):
         )
         self.setCentralWidget(self.tabla)
 
-        self.uids_mostrados = set()  # guardamos los UID ya agregados
+        self.uids_mostrados = set() # guardamos los UID ya agregados
+        self.primera_carga = True
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.actualizar_pagos)
@@ -43,9 +44,17 @@ class VentanaPrincipal(QMainWindow):
         self.worker.start()
 
     def mostrar_pagos(self, pagos):
+        if self.primera_carga:
+            # Solo sincroniza, no muestra nada
+            for pago in pagos:
+                self.uids_mostrados.add(pago["uid"])
+            self.primera_carga = False
+            return
+
         for pago in pagos:
             if pago["uid"] in self.uids_mostrados:
-                continue  # ya está agregado
+                continue
+
             fila = self.tabla.rowCount()
             self.tabla.insertRow(fila)
             self.tabla.setItem(fila, 0, QTableWidgetItem(pago["comercio"]))
@@ -55,7 +64,6 @@ class VentanaPrincipal(QMainWindow):
             self.tabla.setItem(fila, 4, QTableWidgetItem(pago["hora"]))
 
             self.uids_mostrados.add(pago["uid"])
-
 
 from config import crear_o_validar_env
 
