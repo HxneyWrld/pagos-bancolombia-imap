@@ -7,6 +7,9 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QTimer, QThread, pyqtSignal, Qt
 from backend import revisar_correos
+from PyQt6.QtMultimedia import QSoundEffect
+from PyQt6.QtCore import QUrl
+
 
 
 # ===================== ARCHIVO DE PERSISTENCIA =====================
@@ -42,6 +45,12 @@ class WorkerRevisarCorreos(QThread):
 class VentanaPrincipal(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # ---------- SONIDO DE NOTIFICACIÓN ----------
+        self.sonido = QSoundEffect()
+        self.sonido.setSource(QUrl.fromLocalFile("notification.wav"))
+        self.sonido.setVolume(1.0)
+
         self.primera_revision = True
 
         self.setWindowTitle("Pagos Bancolombia")
@@ -170,7 +179,6 @@ class VentanaPrincipal(QMainWindow):
 
     def mostrar_pagos(self, pagos):
         if self.primera_revision:
-            # SOLO sincroniza UIDs, NO guarda ni muestra
             for pago in pagos:
                 self.uids_mostrados.add(pago["uid"])
             self.primera_revision = False
@@ -186,6 +194,9 @@ class VentanaPrincipal(QMainWindow):
             self.pagos_guardados.append(pago)
             guardar_pagos(self.pagos_guardados)
 
+            # SONIDO DE NUEVO PAGO
+            self.sonido.stop()
+            self.sonido.play()
 
 # ===================== MAIN =====================
 from config import crear_o_validar_env
