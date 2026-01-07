@@ -108,9 +108,11 @@ Si se borra last_uid.txt, el sistema se resincroniza automáticamente con el úl
 
 ## Personalización
 
-Puedes cambiar el nombre del negocio editando en el archivo ui.py:
+Puedes cambiar el nombre del negocio editando en el archivo .env:
 
-self.label_titulo = QLabel("🏥 NOMBRE DE TU DROGUERÍA")
+```shell
+NOMBRE_NEGOCIO=<<Aquí va el nombre de tu negocio>>
+```
 
 ---
 

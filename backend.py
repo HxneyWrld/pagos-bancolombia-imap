@@ -51,7 +51,7 @@ def revisar_correos():
 
             texto = msg.text or msg.html or ""
 
-            print(f"\nUID {uid} -> TEXTO: {texto[:500]}")
+#            print(f"\nUID {uid} -> TEXTO: {texto[:500]}") <--- !No loggear TODO, recuerda que esto se ejecuta en local, estarías mostrando info de todos los correos!
             # print(f"UID {uid} | Texto inicio: {texto[:100]}")
 
             # Patrones de Bancolombia

@@ -14,6 +14,14 @@ from PyQt6.QtCore import QUrl
 # ===================== ARCHIVO DE PERSISTENCIA =====================
 PAGOS_FILE = "pagos_guardados.json"
 
+def extraer_nombre_negocio():
+    NOMBRE_NEGOCIO = os.getenv("NOMBRE_NEGOCIO")
+
+    if NOMBRE_NEGOCIO:
+        return NOMBRE_NEGOCIO
+
+    return "PAGOS QR DROGUERÍA"
+
 
 def cargar_pagos_guardados():
     if not os.path.exists(PAGOS_FILE):
@@ -62,7 +70,8 @@ class VentanaPrincipal(QMainWindow):
         layout.setContentsMargins(20, 20, 20, 20)
 
         # ---------- HEADER ----------
-        self.label_titulo = QLabel("🏥 DROGUERÍA XD")
+
+        self.label_titulo = QLabel(extraer_nombre_negocio())
         self.label_titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label_titulo.setStyleSheet("""
             QLabel {
