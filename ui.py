@@ -6,10 +6,9 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QHeaderView
 )
 from PyQt6.QtCore import QTimer, QThread, pyqtSignal, Qt
-from backend import revisar_correos
+from backend import revisar_correos, testear_inicio_sesion
 from PyQt6.QtMultimedia import QSoundEffect
 from PyQt6.QtCore import QUrl
-
 
 
 # ===================== ARCHIVO DE PERSISTENCIA =====================
@@ -207,10 +206,13 @@ if not crear_o_validar_env():
 
 
 def main():
-    app = QApplication(sys.argv)
-    ventana = VentanaPrincipal()
-    ventana.show()
-    sys.exit(app.exec())
+    if testear_inicio_sesion():
+        app = QApplication(sys.argv)
+        ventana = VentanaPrincipal()
+        ventana.show()
+        sys.exit(app.exec())
+    else:
+        print("No se pudo inicializar la aplicación debido a un error. ")
 
 
 if __name__ == "__main__":

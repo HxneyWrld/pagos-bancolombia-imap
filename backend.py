@@ -22,6 +22,13 @@ def save_last_uid(uid):
     with open(STATE_FILE, "w") as f:
         f.write(str(uid))
 
+def testear_inicio_sesion():
+    try:
+        mb = MailBox("imap.gmail.com").login(MAIL_USERNAME, MAIL_PASSWORD, "INBOX")
+        if mb:
+            return True
+    except:
+        return False
 
 def revisar_correos():
     nuevos_pagos = []
