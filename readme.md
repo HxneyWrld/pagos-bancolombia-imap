@@ -28,24 +28,37 @@ Aplicación de escritorio desarrollada en Python + PyQt6 que permite leer autom�
 
 Clona el repositorio y entra a la carpeta del proyecto:
 
-git clone https://github.com/tu-usuario/pagos-bancolombia-imap  
-cd pagos-bancolombia-imap  
+```shell
+git clone https://github.com/tu-usuario/pagos-bancolombia-imap
+```
+
+```shell
+cd pagos-bancolombia-imap
+```
 
 (Opcional) Crear entorno virtual:
 
-python -m venv .venv  
+```shell
+python -m venv .venv
+```
 
 Activar el entorno virtual en Windows:
 
-.venv\Scripts\activate  
+```shell
+.venv\Scripts\activate
+```
 
 Activar el entorno virtual en Linux / macOS:
 
-source .venv/bin/activate  
+```shell
+source .venv/bin/activate
+```
 
 Instalar dependencias:
 
-pip install -r requirements.txt  
+```shell
+pip install -r requirements.txt
+```
 
 ---
 
@@ -55,8 +68,10 @@ Al ejecutar el programa por primera vez, se creará automáticamente el archivo 
 
 Edita el archivo .env y completa las variables:
 
-MAIL_USERNAME=tu_correo@gmail.com  
-MAIL_PASSWORD=tu_contraseña_de_aplicacion  
+```
+MAIL_USERNAME=tu_correo@gmail.com
+MAIL_PASSWORD=tu_contraseña_de_aplicacion
+```
 
 IMPORTANTE:
 No uses tu contraseña normal de Gmail.
@@ -68,7 +83,9 @@ Debes usar una contraseña de aplicación.
 
 Ejecuta la aplicación con:
 
-python ui.py  
+```shell
+python ui.py
+```
 
 Comportamiento al iniciar:
 - Carga pagos guardados previamente
@@ -79,10 +96,10 @@ Comportamiento al iniciar:
 
 ## Persistencia
 
-pagos_guardados.json  
+pagos_guardados.json
 Guarda los pagos detectados para no perderlos al cerrar el programa.
 
-last_uid.txt  
+last_uid.txt
 Guarda el UID del último correo procesado para evitar duplicados.
 
 Si se borra last_uid.txt, el sistema se resincroniza automáticamente con el último correo disponible.
