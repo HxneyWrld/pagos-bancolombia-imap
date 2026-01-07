@@ -1,4 +1,4 @@
-from imap_tools import MailBox
+from imap_tools import MailBox, MailboxLoginError
 from dotenv import load_dotenv
 import re
 import os
@@ -27,7 +27,8 @@ def testear_inicio_sesion():
         mb = MailBox("imap.gmail.com").login(MAIL_USERNAME, MAIL_PASSWORD, "INBOX")
         if mb:
             return True
-    except:
+    except MailboxLoginError:
+        print("Error de inicio de sesión. ")
         return False
 
 def revisar_correos():
